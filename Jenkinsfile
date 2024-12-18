@@ -2,7 +2,7 @@ pipeline {
   agent {
 
     docker {
-      image 'devcvs-srv01:5000/shop2-backend/jenkins-agent'
+      image '158.160.134.181:8123/jenkins-agent:1.0.0'
     }
 
   }
@@ -25,18 +25,19 @@ pipeline {
 
     stage('Make docker image') {
       steps {
-        sh 'cp -R gateway-api/build/libs/* docker-setup/shop/gateway-api && cd docker-setup/shop/gateway-api && docker build --tag=gateway-api .'
-        sh 'docker push devcvs-srv01:5000/shop2-backend/gateway-api:2-staging'
+        sh 'cd /app'
+        git 'https://github.com/bdkminer/pipeline.git'
+        sh 'cp /app/pipeline/Dockerfile /app && rm -r app/pipeline && docker build --tag=mywebapp:1.0.0 .'
+        sh 'docker push 158.160.134.181:8123/mywebapp:1.0.0'
 
       }
     }
 
     stage('Run docker on prod') {
       steps {
-        sh '''ssh root@51.250.44.229 << EOF
-	sudo docker pull devcvs-srv01:5000/shop2-backend/gateway-api:2-staging
-	cd /etc/shop/docker
-	sudo docker-compose up -d
+        sh '''ssh root@158.160.156.115 << EOF
+	sudo docker pull 158.160.134.181:8123/mywebapp:1.0.0
+	sudo docker run -d -p 8080:8080 158.160.134.181:8123/mywebapp:1.0.0
 EOF'''
       }
     }
