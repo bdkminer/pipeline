@@ -2,7 +2,7 @@ pipeline {
   agent {
 
     docker {
-      image '158.160.134.181:8123/jenkins-agent:1.0.0'
+      image 'jenkins-agent:1.0.0'
     }
 
   }
