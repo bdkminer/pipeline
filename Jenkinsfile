@@ -2,7 +2,8 @@ pipeline {
   agent {
 
     docker {
-      image 'jenkins-agent:1.0.0'
+      image '158.160.133.56:8123/jenkins-agent:1.0.1'
+      args '-v /var/run/docker.sock:/var/run/docker.sock -v /etc/group:/etc/group:ro'
     }
 
   }
@@ -28,16 +29,16 @@ pipeline {
         sh 'cd /app'
         git 'https://github.com/bdkminer/pipeline.git'
         sh 'cp /app/pipeline/Dockerfile /app && rm -r app/pipeline && docker build --tag=mywebapp:1.0.0 .'
-        sh 'docker push 158.160.134.181:8123/mywebapp:1.0.0'
+        sh 'docker push 158.160.133.56:8123/mywebapp:1.0.0'
 
       }
     }
 
     stage('Run docker on prod') {
       steps {
-        sh '''ssh root@158.160.156.115 << EOF
-	sudo docker pull 158.160.134.181:8123/mywebapp:1.0.0
-	sudo docker run -d -p 8080:8080 158.160.134.181:8123/mywebapp:1.0.0
+        sh '''ssh root@158.160.153.35 << EOF
+	sudo docker pull 158.160.133.56:8123/mywebapp:1.0.0
+	sudo docker run -d -p 8080:8080 158.160.133.56:8123/mywebapp:1.0.0
 EOF'''
       }
     }
